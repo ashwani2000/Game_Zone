@@ -1,39 +1,201 @@
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
-    <link rel="preconnect" href="https://fonts.gstatic.com">
-    <script src="./index.js"></script>
-    <title>Tic-Tac-Toe</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#0b1020" />
+    <meta name="description"
+        content="Tic Tac Toe Zone — play Tic Tac Toe online with a friend. Create a room ID, share it, and play in real time on mobile or desktop." />
+    <title>Tic Tac Toe Zone — Online Multiplayer</title>
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
-    <main class="background">
-        <section class="title">
-            <h1>Tic Tac Toe <br></h1>
+    <div class="blobs" aria-hidden="true"><span></span><span></span><span></span></div>
+
+    <main class="app">
+        <!-- ================= LOBBY ================= -->
+        <section id="screen-lobby" class="screen">
+            <h1 class="logo"><span class="lx">TIC</span> <span class="lo">TAC</span> <span class="lx">TOE</span>
+                <span class="logo-zone">ZONE</span></h1>
+            <p class="tagline">Online multiplayer • Create a room ID, share it, and play with your friend in real
+                time.</p>
+
+            <div class="cards">
+                <article class="card card-host">
+                    <div class="card-icon">🎮</div>
+                    <h2>Create Game</h2>
+                    <p>Generate a unique room ID and invite your friend to play.</p>
+                    <button id="btn-create" class="btn btn-primary" type="button">⚡ Create ID</button>
+                </article>
+                <article class="card card-join">
+                    <div class="card-icon">🔗</div>
+                    <h2>Join Game</h2>
+                    <p>Enter the ID your friend shared with you.</p>
+                    <input id="join-code" class="code-input" type="text" inputmode="text" autocomplete="off"
+                        spellcheck="false" placeholder="E.G. K7QP2" maxlength="5" aria-label="Room ID" />
+                    <button id="btn-join" class="btn btn-accent" type="button">🚀 Join ID</button>
+                </article>
+            </div>
+
+            <div class="lobby-extra">
+                <button id="btn-local" class="btn btn-ghost" type="button">👤 Play on this device</button>
+            </div>
+
+            <nav class="dev-nav" aria-label="Developer navigation">
+                <button id="btn-dev" class="dev-nav-btn" type="button">
+                    <span class="dev-nav-avatar" aria-hidden="true">
+                        <span class="dev-nav-initials">AS</span>
+                        <img class="dev-nav-photo" src="developer.jpg" alt=""
+                            onerror="if(!this.dataset.f){this.dataset.f='1';this.src='developer.png';}else{this.style.display='none';}">
+                    </span>
+                    <span class="dev-nav-text">
+                        <strong>Who created this game?</strong>
+                        <small>Meet the developer →</small>
+                    </span>
+                </button>
+            </nav>
+
+            <p id="lobby-status" class="status-note" role="status"></p>
+            <footer class="hint">Tip: just send the room ID to your friend on chat — they open this site and tap
+                “Join ID”.</footer>
         </section>
-        <section class="display">
-            Player <span class="display-player playerX">X</span>'s turn
+        <!-- ================= GAME ================= -->
+        <section id="screen-game" class="screen hide">
+            <header class="game-top">
+                <button id="btn-leave" class="btn btn-ghost btn-small" type="button">← Leave</button>
+                <div id="conn-badge" class="conn-badge off"><i></i><span>Offline</span></div>
+                <button id="btn-sound" class="btn btn-ghost btn-small" type="button" aria-label="Toggle sound">🔊</button>
+            </header>
+
+            <div id="room-bar" class="room-bar hide">
+                <span class="room-label">ROOM&nbsp;ID</span>
+                <span id="room-code" class="room-code">—</span>
+                <button id="btn-copy" class="chip-btn" type="button">📋 Copy</button>
+                <button id="btn-share" class="chip-btn" type="button">📤 Share</button>
+            </div>
+
+            <div class="scoreboard">
+                <div id="score-card-x" class="score score-x"><span id="name-x">Player X</span><b id="score-x">0</b></div>
+                <div class="score score-t"><span>Ties</span><b id="score-t">0</b></div>
+                <div id="score-card-o" class="score score-o"><span id="name-o">Player O</span><b id="score-o">0</b></div>
+            </div>
+
+            <div id="turn-banner" class="turn-banner"><span class="dot"></span><span id="turn-text">…</span></div>
+
+            <div class="board-wrap">
+                <svg id="strike" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+                    <line x1="0" y1="0" x2="0" y2="0" vector-effect="non-scaling-stroke" />
+                </svg>
+                <div id="board" class="board">
+                    <button class="tile" type="button" data-i="0" aria-label="Cell 1"></button>
+                    <button class="tile" type="button" data-i="1" aria-label="Cell 2"></button>
+                    <button class="tile" type="button" data-i="2" aria-label="Cell 3"></button>
+                    <button class="tile" type="button" data-i="3" aria-label="Cell 4"></button>
+                    <button class="tile" type="button" data-i="4" aria-label="Cell 5"></button>
+                    <button class="tile" type="button" data-i="5" aria-label="Cell 6"></button>
+                    <button class="tile" type="button" data-i="6" aria-label="Cell 7"></button>
+                    <button class="tile" type="button" data-i="7" aria-label="Cell 8"></button>
+                    <button class="tile" type="button" data-i="8" aria-label="Cell 9"></button>
+                </div>
+            </div>
+
+            <div id="announcer" class="announcer hide"></div>
+
+            <div class="controls">
+                <button id="btn-rematch" class="btn btn-primary hide" type="button">🔁 Rematch</button>
+                <div id="rematch-prompt" class="rematch-prompt hide">
+                    <span>Opponent wants a rematch</span>
+                    <button id="btn-rematch-accept" class="btn btn-primary btn-small" type="button">Accept</button>
+                    <button id="btn-rematch-decline" class="btn btn-danger btn-small" type="button">Decline</button>
+                </div>
+            </div>
         </section>
-        <section class="container">
-            <div class="tile"></div>
-            <div class="tile"></div>
-            <div class="tile"></div>
-            <div class="tile"></div>
-            <div class="tile"></div>
-            <div class="tile"></div>
-            <div class="tile"></div>
-            <div class="tile"></div>
-            <div class="tile"></div>
-        </section>
-        <section class="display announcer hide"></section>
-        <section class="controls">
-            <button id="reset">Reset</button>
+        <!-- ================= DEVELOPER ================= -->
+        <section id="screen-dev" class="screen hide">
+            <header class="game-top">
+                <button id="btn-dev-back" class="btn btn-ghost btn-small" type="button">← Back</button>
+                <div class="conn-badge on"><i></i><span>Developer</span></div>
+                <span class="top-spacer" aria-hidden="true"></span>
+            </header>
+
+            <div class="dev-card">
+                <div class="dev-photo-wrap" aria-hidden="true">
+                    <span class="dev-initials">AS</span>
+                    <img id="dev-photo" class="dev-photo" src="developer.jpg" alt="Ashwani Sharma — Developer"
+                        onerror="if(!this.dataset.f){this.dataset.f='1';this.src='developer.png';}else{this.style.display='none';}">
+                </div>
+                <h2 class="dev-name">Ashwani Sharma</h2>
+                <p class="dev-role">Full Stack Developer</p>
+                <span class="dev-status">🎯 Currently focusing on building &amp; shipping</span>
+                <p class="dev-bio">
+                    Hi! I'm <b>Ashwani</b> — the developer who designed and built
+                    <b>Tic Tac Toe Zone</b>. I'm a Full Stack Developer from <b>Noida, India</b> who
+                    loves crafting clean, playful web experiences — from pixel-perfect interfaces to the
+                    logic that powers them. This game is 100% vanilla HTML, CSS &amp; JavaScript with a
+                    backend-free peer-to-peer multiplayer connection.
+                </p>
+
+                <div class="dev-block">
+                    <h3>⚡ Skills &amp; Stack</h3>
+                    <div class="skill-chips">
+                        <span class="chip chip-hl">Full Stack Development</span>
+                        <span class="chip chip-hl">Generative AI</span>
+                        <span class="chip chip-hl">Product Thinking</span>
+                        <span class="chip chip-hl">Building for People</span>
+                    </div>
+                    <p class="skill-sub">Tech I work with</p>
+                    <div class="skill-chips">
+                        <span class="chip chip-dim">Web Design &amp; Development</span>
+                        <span class="chip chip-dim">HTML</span>
+                        <span class="chip chip-dim">CSS</span>
+                        <span class="chip chip-dim">JavaScript</span>
+                        <span class="chip chip-dim">Bootstrap</span>
+                        <span class="chip chip-dim">UI/UX Prototyping</span>
+                        <span class="chip chip-dim">Python</span>
+                        <span class="chip chip-dim">Django</span>
+                    </div>
+                </div>
+
+                <div class="dev-block">
+                    <h3>🚀 Also built by me</h3>
+                    <p class="dev-line"><b>Partyvello</b> — an open-source JavaScript project, live on my
+                        GitHub along with this game (<b>Game_Zone</b>).</p>
+                </div>
+
+                <div class="dev-block">
+                    <h3>📍 Based in</h3>
+                    <p class="dev-line">Noida, India — open to collaboration &amp; opportunities.</p>
+                </div>
+            </div>
+
+            <div class="dev-connect">
+                <a id="dev-portfolio" class="btn btn-primary btn-big" href="https://ashwanidev.netlify.app/"
+                    target="_blank" rel="noopener noreferrer">🌐 Connect — Visit My Full Portfolio</a>
+                <div class="dev-links">
+                    <a class="chip-btn" href="https://github.com/ashwani2000" target="_blank"
+                        rel="noopener noreferrer">🐙 GitHub — @ashwani2000</a>
+                    <a class="chip-btn" href="https://www.linkedin.com/in/ashwani-sharma-a501761aa"
+                        target="_blank" rel="noopener noreferrer">💼 LinkedIn — Ashwani Sharma</a>
+                </div>
+            </div>
+
+            <footer class="hint">Want to see more of my work? The portfolio above has my full story,
+                projects and ways to reach me.</footer>
         </section>
     </main>
+
+    <div id="toast" class="toast" role="status"></div>
+
+    <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+    <script src="app.js" defer></script>
 </body>
 
 </html>

@@ -1,0 +1,11 @@
+{
+  "name": "tic-tac-toe-zone",
+  "version": "1.0.0",
+  "description": "Tic Tac Toe Zone — online multiplayer Tic Tac Toe (Create ID / Join ID). Static site, deployable on Netlify with no build step.",
+  "scripts": {
+    "dev": "node dev-server.js",
+    "start": "node dev-server.js"
+  },
+  "license": "MIT",
+  "private": true
+}
