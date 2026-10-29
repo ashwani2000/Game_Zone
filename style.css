@@ -883,6 +883,28 @@ body {
     color: var(--text);
 }
 
+/* Clickable project link (Partyvello) on the Developer page */
+.dev-project-link {
+    color: #ffffff;
+    text-decoration: none;
+    transition: text-shadow 0.2s ease, opacity 0.2s ease;
+}
+
+.dev-project-link:hover {
+    opacity: 0.85;
+    text-shadow: 0 0 16px rgba(255, 255, 255, 0.45);
+}
+
+/* Keep the link readable on the light background (pure white would be invisible) */
+html[data-theme='light'] .dev-project-link {
+    color: #0f172a;
+}
+
+html[data-theme='light'] .dev-project-link:hover {
+    text-shadow: none;
+    opacity: 0.7;
+}
+
 .skill-chips {
     display: flex;
     flex-wrap: wrap;
