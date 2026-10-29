@@ -38,6 +38,7 @@ This is a **fully static site** — nothing to build, nothing to configure.
 1. Go to <https://app.netlify.com/drop>
 2. Drag this whole folder onto the page. Done — multiplayer works out of the box.
 
+
 **Option B — From Git:**
 1. Push this repo to GitHub
 2. In Netlify: *Add new site → Import an existing project* → pick the repo

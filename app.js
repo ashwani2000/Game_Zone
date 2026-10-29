@@ -55,7 +55,10 @@
     const toastEl = $('#toast');
     const devEl = $('#screen-dev');
     const btnDev = $('#btn-dev');
+    const btnDevGame = $('#btn-dev-game');
     const btnDevBack = $('#btn-dev-back');
+    const themeBtns = Array.from(document.querySelectorAll('.theme-toggle'));
+    const metaTheme = document.querySelector('#meta-theme');
 
     // ---------- State ----------
     const freshBoard = () => Array(9).fill('');
@@ -107,10 +110,45 @@
         devEl.classList.add('hide');
     }
 
-    function showDev() {
+    let devReturnTo = 'lobby';
+
+    // Developer screen always opens from the top, no matter which view it was opened from.
+    function showDev(origin) {
+        if (origin) devReturnTo = origin;
         lobbyEl.classList.add('hide');
         gameEl.classList.add('hide');
         devEl.classList.remove('hide');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Return to the view the developer page was opened from.
+    function devBack() {
+        if (devReturnTo === 'game') showGame();
+        else showLobby();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // ---------- Theme (dark / light) ----------
+    const THEME_KEY = 'ttt-theme';
+
+    function applyTheme(theme, persist) {
+        document.documentElement.setAttribute('data-theme', theme);
+        if (persist) {
+            try { localStorage.setItem(THEME_KEY, theme); } catch (_) { }
+        }
+        themeBtns.forEach((btn) => {
+            btn.textContent = theme === 'light' ? '🌙' : '☀️';
+            btn.setAttribute('aria-label', theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode');
+            btn.title = theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode';
+        });
+        if (metaTheme) {
+            metaTheme.setAttribute('content', theme === 'light' ? '#eef2f7' : '#0b1020');
+        }
+    }
+
+    function toggleTheme() {
+        const next = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+        applyTheme(next, true);
     }
 
     function setBadge(kind, text) {
@@ -723,8 +761,10 @@
         state.opponentReady = true;
         enterGame();
     });
-    btnDev.addEventListener('click', () => { sfx('click'); showDev(); });
-    btnDevBack.addEventListener('click', () => { sfx('click'); showLobby(); });
+    btnDev.addEventListener('click', () => { sfx('click'); showDev('lobby'); });
+    btnDevGame.addEventListener('click', () => { sfx('click'); showDev('game'); });
+    btnDevBack.addEventListener('click', () => { sfx('click'); devBack(); });
+    themeBtns.forEach((btn) => btn.addEventListener('click', () => { toggleTheme(); sfx('click'); }));
     joinInput.addEventListener('input', () => {
         joinInput.value = joinInput.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, CODE_LEN);
     });
@@ -765,6 +805,7 @@
     window.addEventListener('beforeunload', () => { try { if (state.peer) state.peer.destroy(); } catch (_) { } });
 
     // ---------- Init ----------
+    applyTheme(document.documentElement.getAttribute('data-theme') || 'dark', false);
     btnSound.textContent = state.soundOn ? '🔊' : '🔇';
     showLobby();
     render();

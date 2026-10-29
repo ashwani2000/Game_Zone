@@ -4,7 +4,18 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="theme-color" content="#0b1020" />
+    <meta id="meta-theme" name="theme-color" content="#0b1020" />
+    <script>
+        // Apply saved theme before first paint to avoid a flash of the wrong theme.
+        (function () {
+            var t = null;
+            try { t = localStorage.getItem('ttt-theme'); } catch (_) { }
+            if (t !== 'light' && t !== 'dark') {
+                t = (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) ? 'light' : 'dark';
+            }
+            document.documentElement.setAttribute('data-theme', t);
+        })();
+    </script>
     <meta name="description"
         content="Tic Tac Toe Zone — play Tic Tac Toe online with a friend. Create a room ID, share it, and play in real time on mobile or desktop." />
     <title>Tic Tac Toe Zone — Online Multiplayer</title>
@@ -23,6 +34,9 @@
     <main class="app">
         <!-- ================= LOBBY ================= -->
         <section id="screen-lobby" class="screen">
+            <header class="top-actions">
+                <button class="theme-toggle" type="button" aria-label="Switch to light mode" title="Switch theme">☀️</button>
+            </header>
             <h1 class="logo"><span class="lx">TIC</span> <span class="lo">TAC</span> <span class="lx">TOE</span>
                 <span class="logo-zone">ZONE</span></h1>
             <p class="tagline">Online multiplayer • Create a room ID, share it, and play with your friend in real
@@ -72,7 +86,14 @@
             <header class="game-top">
                 <button id="btn-leave" class="btn btn-ghost btn-small" type="button">← Leave</button>
                 <div id="conn-badge" class="conn-badge off"><i></i><span>Offline</span></div>
-                <button id="btn-sound" class="btn btn-ghost btn-small" type="button" aria-label="Toggle sound">🔊</button>
+                <div class="top-right">
+                    <button id="btn-dev-game" class="btn btn-ghost btn-small icon-btn" type="button"
+                        aria-label="Meet the developer" title="Meet the developer">👨‍💻</button>
+                    <button class="theme-toggle theme-toggle-small" type="button" aria-label="Switch to light mode"
+                        title="Switch theme">☀️</button>
+                    <button id="btn-sound" class="btn btn-ghost btn-small icon-btn" type="button"
+                        aria-label="Toggle sound">🔊</button>
+                </div>
             </header>
 
             <div id="room-bar" class="room-bar hide">
@@ -123,7 +144,10 @@
             <header class="game-top">
                 <button id="btn-dev-back" class="btn btn-ghost btn-small" type="button">← Back</button>
                 <div class="conn-badge on"><i></i><span>Developer</span></div>
-                <span class="top-spacer" aria-hidden="true"></span>
+                <div class="top-right">
+                    <button class="theme-toggle theme-toggle-small" type="button" aria-label="Switch to light mode"
+                        title="Switch theme">☀️</button>
+                </div>
             </header>
 
             <div class="dev-card">
